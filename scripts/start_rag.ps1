@@ -1,7 +1,7 @@
 param(
     [switch]$UseConfiguredLLM,
     [ValidateRange(1, 65535)]
-    [int]$BackendPort = 8000,
+    [int]$BackendPort = 8001,
     [ValidateRange(1, 65535)]
     [int]$FrontendPort = 3000
 )

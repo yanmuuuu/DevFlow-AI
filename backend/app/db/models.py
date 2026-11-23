@@ -213,7 +213,7 @@ class KnowledgeBaseConfig(Base):
     retrieval_method: Mapped[str] = mapped_column(String(40), default="hybrid")
     rerank_enabled: Mapped[bool] = mapped_column(default=True)
     rerank_provider: Mapped[str] = mapped_column(String(80), default="qwen_api")
-    rerank_model: Mapped[str] = mapped_column(String(240), default="qwen3-rerank")
+    rerank_model: Mapped[str] = mapped_column(String(240), default="qwen3.7-text-rerank")
     top_k: Mapped[int] = mapped_column(Integer, default=3)
     score_threshold_enabled: Mapped[bool] = mapped_column(default=True)
     score_threshold: Mapped[float] = mapped_column(Float, default=0.8)

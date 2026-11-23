@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_name: str = "DevFlow AI"
     api_host: str = "0.0.0.0"
-    api_port: int = 8000
+    api_port: int = 8001
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001"
 
     database_url: str = "postgresql+psycopg://devflow:devflow@localhost:5432/devflow"
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     dashscope_embedding_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     rerank_api_key: str | None = None
     rerank_base_url: str | None = None
-    qwen_rerank_model: str = "qwen3-rerank"
+    qwen_rerank_model: str = "qwen3.7-text-rerank"
     qwen_retrieval_instruction: str = "Given a user question, retrieve passages that contain the facts needed to answer it."
 
     milvus_enabled: bool = True

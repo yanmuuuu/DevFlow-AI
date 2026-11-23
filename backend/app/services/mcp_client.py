@@ -12,6 +12,27 @@ class McpClientError(RuntimeError):
     pass
 
 
+def _running_loop_supports_subprocess() -> bool:
+    # uvicorn on Windows uses the selector loop, which cannot spawn subprocesses.
+    if sys.platform != "win32":
+        return True
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        return True
+    return isinstance(loop, asyncio.ProactorEventLoop)
+
+
+def _run_on_proactor_loop(coro: Any) -> Any:
+    if sys.platform == "win32":
+        loop = asyncio.ProactorEventLoop()
+        try:
+            return loop.run_until_complete(coro)
+        finally:
+            loop.close()
+    return asyncio.run(coro)
+
+
 class StdioMcpClient:
     def __init__(self, command: str | None = None, args: list[str] | None = None, cwd: str | None = None) -> None:
         backend_root = Path(__file__).resolve().parents[2]
@@ -21,6 +42,18 @@ class StdioMcpClient:
         self._next_id = 1
 
     async def call_tool(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        return await self._on_subprocess_loop(self._call_tool(name, arguments))
+
+    async def inspect_server(self) -> dict[str, Any]:
+        """Perform a real MCP handshake and return the server's advertised tools."""
+        return await self._on_subprocess_loop(self._inspect_server())
+
+    async def _on_subprocess_loop(self, coro: Any) -> Any:
+        if _running_loop_supports_subprocess():
+            return await coro
+        return await asyncio.to_thread(_run_on_proactor_loop, coro)
+
+    async def _call_tool(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         process = await self._start()
         try:
             await self._initialize(process)
@@ -29,8 +62,7 @@ class StdioMcpClient:
         finally:
             await self._stop(process)
 
-    async def inspect_server(self) -> dict[str, Any]:
-        """Perform a real MCP handshake and return the server's advertised tools."""
+    async def _inspect_server(self) -> dict[str, Any]:
         process = await self._start()
         try:
             initialize = await self._initialize(process)

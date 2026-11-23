@@ -95,8 +95,8 @@ def model_catalog() -> dict[str, Any]:
         "rerank_models": [
             {
                 "provider": "qwen_api",
-                "model": "qwen3-rerank",
-                "label": "Qwen3-Rerank（百炼 API）",
+                "model": "qwen3.7-text-rerank",
+                "label": "Qwen3.7-Text-Rerank（百炼 API）",
                 "available": qwen_api_ready,
                 "recommended": True,
                 "fallback": "heuristic",
@@ -204,7 +204,7 @@ async def _qwen_rerank(
                 **item,
                 "score": round(score, 4),
                 "rerank_score": round(score, 4),
-                "rank_reason": "qwen3-rerank",
+                "rank_reason": "qwen3.7-text-rerank",
                 "retrieval": {
                     **(item.get("retrieval") or {}),
                     "rerank_mode": "qwen_api",
